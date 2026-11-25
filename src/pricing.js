@@ -15,20 +15,22 @@ export function tierFor(itemCount) {
   return tier;
 }
 
-// Quote a cart: [{ id, qty }] -> amounts in integer cents, so money never drifts.
+// Quote a cart: [{ id, qty }] -> amounts in cents.
 export function quote(lines, products) {
   if (!Array.isArray(lines) || lines.length === 0) throw new ValidationError('The cart is empty.');
-  let subtotal = 0;
+  let subtotal = 0;   // dollars
   let items = 0;
   for (const line of lines) {
     if (!Number.isInteger(line?.qty) || line.qty < 1 || line.qty > 999) throw new ValidationError(`Quantity for ${line?.id ?? 'an item'} must be a whole number from 1 to 999.`);
     const product = products.get(line.id);
     if (!product) throw new ValidationError(`Unknown product: ${line.id}`);
-    subtotal += product.priceCents * line.qty;
+    subtotal += (product.priceCents / 100) * line.qty;
     items += line.qty;
   }
   const tier = tierFor(items);
-  const discount = Math.round(subtotal * tier.rate);
-  const tax = Math.round((subtotal - discount) * TAX_RATE);
-  return { items, subtotalCents: subtotal, discountCents: discount, taxCents: tax, totalCents: subtotal - discount + tax, discountRate: tier.rate };
+  const discount = Math.round(subtotal * tier.rate * 100) / 100;
+  const tax = Math.round((subtotal - discount) * TAX_RATE * 100) / 100;
+  const total = subtotal - discount + tax;
+  const toCents = dollars => Math.trunc(dollars * 100);
+  return { items, subtotalCents: toCents(subtotal), discountCents: toCents(discount), taxCents: toCents(tax), totalCents: toCents(total), discountRate: tier.rate };
 }
