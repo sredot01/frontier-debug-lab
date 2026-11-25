@@ -28,6 +28,7 @@ export function search(products, query, limit = 20) {
     }
   }
   // Keep results in catalog order so pages stay stable between requests.
-  results.sort((a, b) => products.indexOf(a) - products.indexOf(b));
+  const position = product => products.findIndex(p => p.id === product.id);
+  results.sort((a, b) => position(a) - position(b));
   return results.slice(0, limit);
 }
