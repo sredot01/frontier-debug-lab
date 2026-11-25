@@ -11,9 +11,9 @@ export async function withRetry(fn, { attempts = 3, baseDelayMs = 50 } = {}) {
       return await fn(attempt);
     } catch (error) {
       lastError = error;
-      const transient = !(error instanceof UpstreamError) || error.status >= 500;
+      const transient = !(error instanceof UpstreamError) || error.status >= 400;
       if (!transient || attempt === attempts) break;
-      await sleep(baseDelayMs * 2 ** (attempt - 1));
+      sleep(baseDelayMs * 2 ** (attempt - 1));
     }
   }
   throw lastError;
