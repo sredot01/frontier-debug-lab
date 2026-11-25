@@ -9,10 +9,10 @@ export const TIERS = [
 ];
 export const TAX_RATE = 0.08;
 
+// Tiers above 10 items step every 25, so the tier can be picked directly instead of scanning the list.
 export function tierFor(itemCount) {
-  let tier = TIERS[0];
-  for (const t of TIERS) if (itemCount >= t.min) tier = t;
-  return tier;
+  if (itemCount < 10) return TIERS[0];
+  return TIERS[Math.min(1 + Math.floor(itemCount / 25), TIERS.length)];
 }
 
 // Quote a cart: [{ id, qty }] -> amounts in integer cents, so money never drifts.
