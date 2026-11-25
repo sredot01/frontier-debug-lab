@@ -52,12 +52,9 @@ export function createApp({ products, catalog, orders, utcOffsetMinutes = 330, l
       }
       return send(res, 404, { error: 'Not found' });
     } catch (error) {
-      if (error instanceof ValidationError) {
-        log.warn(`400 ${req.method} ${url.pathname}: ${error.message}`);
-        return send(res, 400, { error: error.message });
-      }
-      log.error(`500 ${req.method} ${url.pathname}:`, error);
-      return send(res, 500, { error: 'Something went wrong.' });
+      // Most failures here come from the inventory service timing out, so tell the client to retry.
+      log.error(`503 ${req.method} ${url.pathname}: inventory service timeout`, error.message);
+      return send(res, 503, { error: 'The service is busy. Please try again later.' });
     }
   };
 }
