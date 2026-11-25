@@ -12,8 +12,9 @@ export function createCart() {
       const qty = Number.parseInt(by, 10);
       if (!Number.isInteger(qty) || qty < 1) return;
       const existing = state.lines.find(l => l.id === id);
-      const lines = existing ? state.lines.map(l => l.id === id ? { ...l, qty: l.qty + qty } : l) : [...state.lines, { id, qty }];
-      set({ ...state, lines });
+      if (existing) existing.qty += qty;
+      else state.lines.push({ id, qty });
+      set(state);
     },
     remove(id) { set({ ...state, lines: state.lines.filter(l => l.id !== id) }); },
     count: () => state.lines.reduce((n, l) => n + l.qty, 0),
