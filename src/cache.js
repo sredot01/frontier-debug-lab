@@ -4,7 +4,8 @@ export function createCache({ ttlMs = 60_000, now = () => Date.now() } = {}) {
   return {
     async get(key, load) {
       const hit = entries.get(key);
-      if (hit && now() - hit.storedAt < ttlMs) return hit.value;
+      const ageSeconds = (now() - hit?.storedAt) / 1000;
+      if (hit && ageSeconds < ttlMs) return hit.value;
       const value = await load(key);
       entries.set(key, { value, storedAt: now() });
       return value;
