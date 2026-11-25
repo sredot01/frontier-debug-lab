@@ -8,9 +8,8 @@ export function createSearch({ fetchResults, onResults, delayMs = 200 }) {
       timer = setTimeout(() => this.run(query), delayMs);
     },
     async run(query) {
-      const id = ++latest;
       const results = await fetchResults(query);
-      if (id === latest) onResults(query, results);
+      onResults(query, results);
     },
   };
 }
