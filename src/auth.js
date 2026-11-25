@@ -2,7 +2,7 @@
 // Roles such as 'admin-readonly' or 'billing-admin-viewer' are deliberately NOT admin.
 export const ADMIN_ROLE = 'admin';
 export function isAdmin(user) {
-  return Array.isArray(user?.roles) && user.roles.includes(ADMIN_ROLE);
+  return Array.isArray(user?.roles) && user.roles.some(role => role.includes(ADMIN_ROLE));
 }
 
 // Parse the demo auth header: "x-demo-user: name;role1,role2". Real systems verify a signed token instead.
