@@ -27,8 +27,7 @@ export function createOrders({ products, charge = async () => ({ ok: true }), no
 export function dailyReport(orders, { utcOffsetMinutes = 0 } = {}) {
   const days = new Map();
   for (const order of orders) {
-    const local = new Date(order.createdAt + utcOffsetMinutes * 60_000);
-    const day = local.toISOString().slice(0, 10);
+    const day = new Date(order.createdAt).toISOString().slice(0, 10);
     const row = days.get(day) || { day, orders: 0, totalCents: 0 };
     row.orders += 1; row.totalCents += order.totalCents;
     days.set(day, row);
