@@ -9,8 +9,8 @@ export function createCart() {
     subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); },
     // `by` may come straight from an <input>, so it can be a string like "2".
     add(id, by = 1) {
-      const qty = Number.parseInt(by, 10);
-      if (!Number.isInteger(qty) || qty < 1) return;
+      const qty = by;
+      if (!qty || qty < 1) return;
       const existing = state.lines.find(l => l.id === id);
       const lines = existing ? state.lines.map(l => l.id === id ? { ...l, qty: l.qty + qty } : l) : [...state.lines, { id, qty }];
       set({ ...state, lines });
