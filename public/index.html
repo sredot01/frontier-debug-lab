@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Frontier Debug Lab · Store</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Debug Lab Store</h1>
+    <span class="badge" aria-live="polite">Cart: <strong data-count>0</strong></span>
+  </header>
+  <main>
+    <label class="search">Search products <input type="search" data-search placeholder="Try lamp, mug or pro" autocomplete="off"></label>
+    <p class="status" data-status aria-live="polite"></p>
+    <section class="grid" data-results></section>
+  </main>
+</body>
+</html>

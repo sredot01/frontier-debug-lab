@@ -10,20 +10,28 @@ an on-call engineer would first hear about it, in that branch's `TASK.md`.
 
 ```sh
 npm test        # run the tests (Node 18.18 or newer)
-npm start       # start the API on http://localhost:3000
+npm start       # start the API and the storefront on http://localhost:3000
 ```
+
+Open http://localhost:3000/ for the storefront (search, product cards, cart). Its logic lives in `public/lib/` as plain
+modules, so the same code runs in the browser and in `npm test`.
 
 | Endpoint | What it does |
 |---|---|
 | `GET /health` | Liveness check |
 | `GET /products/search?q=lamp` | Case-insensitive search on name and tags |
 | `POST /orders/quote` | Body `{"lines":[{"id":"p1","qty":2}]}`, returns subtotal, discount, tax and total in cents |
+| `GET /products?page=2&size=20` | Paged product feed |
+| `POST /orders` | Places an order. Needs an `Idempotency-Key` header, so a retried request is never charged twice |
+| `GET /admin/report` | Daily sales in the store's time zone. Header `x-demo-user: ana;admin` (demo auth) |
 
 ```sh
 curl -s -X POST localhost:3000/orders/quote -H 'Content-Type: application/json' -d '{"lines":[{"id":"p1","qty":2}]}'
 ```
 
 ## Scenarios
+
+### Backend
 
 | Branch | What users report |
 |---|---|
@@ -33,6 +41,20 @@ curl -s -X POST localhost:3000/orders/quote -H 'Content-Type: application/json' 
 | `bug/error-503s` | Customers see "try again later" and the logs blame the inventory service |
 | `bug/inventory-overload` | During an inventory incident we hammered the service |
 | `bug/stale-prices` | Price changes take hours to show up |
+| `bug/duplicate-feed` | The product feed shows some products twice and never shows others |
+| `bug/report-dates` | Late-evening orders land on the wrong day in the sales report |
+| `bug/double-orders` | Some customers were charged twice for one order |
+| `bug/admin-access` | A support agent could open the admin sales report |
+
+### Frontend
+
+| Branch | What users report |
+|---|---|
+| `bug/ui-prices` | Prices on the store look broken, like $12.5 |
+| `bug/ui-quantity` | Adding 2 and then 2 more puts 22 in the cart |
+| `bug/ui-search-flicker` | Search results sometimes jump back to an older search |
+| `bug/ui-security-report` | A security researcher ran script on the store through a product name |
+| `bug/ui-cart-badge` | The cart badge stops updating after the first item |
 
 ```sh
 git switch bug/large-cart && cat TASK.md && npm test
