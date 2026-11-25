@@ -9,16 +9,12 @@ export function createOrders({ products, charge = async () => ({ ok: true }), no
   async function place(lines, { idempotencyKey } = {}) {
     if (!idempotencyKey || !/^[A-Za-z0-9-]{8,64}$/.test(idempotencyKey)) throw new ValidationError('An Idempotency-Key header (8 to 64 letters, digits or dashes) is required.');
     if (byKey.has(idempotencyKey)) return byKey.get(idempotencyKey);
-    const pending = (async () => {
-      const q = quote(lines, products);
-      await charge(q.totalCents);
-      const order = { id: `o${orders.length + 1}`, createdAt: now(), totalCents: q.totalCents, items: q.items };
-      orders.push(order);
-      return order;
-    })();
-    byKey.set(idempotencyKey, pending);
-    pending.catch(() => byKey.delete(idempotencyKey));   // a failed attempt may be retried with the same key
-    return pending;
+    const q = quote(lines, products);
+    await charge(q.totalCents);
+    const order = { id: `o${orders.length + 1}`, createdAt: now(), totalCents: q.totalCents, items: q.items };
+    orders.push(order);
+    byKey.set(idempotencyKey, order);   // remember the result so a retry gets the same order
+    return order;
   }
   return { place, list: () => orders.slice() };
 }
