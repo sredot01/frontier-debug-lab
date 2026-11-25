@@ -8,5 +8,5 @@ test('search stays fast on a 20,000-product catalog', () => {
   const started = performance.now();
   for (const q of ['mug', 'lamp', 'pro', 'desk', 'charger']) search(big, q, 50);
   const ms = performance.now() - started;
-  assert.ok(ms < 400, `5 searches took ${ms.toFixed(0)} ms; the budget is 400 ms`);
+  assert.ok(ms < 150, `5 searches took ${ms.toFixed(0)} ms; the budget is 150 ms`);
 });
