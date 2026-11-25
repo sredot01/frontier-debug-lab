@@ -27,5 +27,7 @@ export function search(products, query, limit = 20) {
       results.push(product);
     }
   }
+  // Keep results in catalog order so pages stay stable between requests.
+  results.sort((a, b) => products.indexOf(a) - products.indexOf(b));
   return results.slice(0, limit);
 }
