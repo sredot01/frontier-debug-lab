@@ -6,5 +6,7 @@ export function paginate(items, page = 1, size = 20) {
   if (!Number.isInteger(page) || page < 1) throw new ValidationError('page must be a whole number from 1.');
   if (!Number.isInteger(size) || size < 1 || size > 100) throw new ValidationError('size must be a whole number from 1 to 100.');
   const start = (page - 1) * size;
-  return { page, size, total: items.length, items: items.slice(start, start + size), hasMore: start + size < items.length };
+  // Include the last item of the previous page so infinite scroll has an anchor to line up against.
+  const from = page > 1 ? start - 1 : start;
+  return { page, size, total: items.length, items: items.slice(from, from + size), hasMore: start + size < items.length };
 }
