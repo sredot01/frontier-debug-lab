@@ -1,0 +1,7 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    { "type": "node", "request": "launch", "name": "Start the API", "program": "${workspaceFolder}/src/server.js" },
+    { "type": "node", "request": "launch", "name": "Debug the tests", "runtimeArgs": ["--test"], "console": "integratedTerminal" }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "frontier-debug-lab",
+  "version": "1.0.0",
+  "description": "A small orders API for practising debugging with AI in mock interviews.",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=18.18" },
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "license": "MIT"
+}

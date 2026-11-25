@@ -1,0 +1,34 @@
+import { ValidationError } from './errors.js';
+
+// Volume discounts by total item count. Every count maps to exactly one tier.
+export const TIERS = [
+  { min: 0, rate: 0 },
+  { min: 10, rate: 0.05 },
+  { min: 25, rate: 0.10 },
+  { min: 50, rate: 0.15 },
+];
+export const TAX_RATE = 0.08;
+
+export function tierFor(itemCount) {
+  let tier = TIERS[0];
+  for (const t of TIERS) if (itemCount >= t.min) tier = t;
+  return tier;
+}
+
+// Quote a cart: [{ id, qty }] -> amounts in integer cents, so money never drifts.
+export function quote(lines, products) {
+  if (!Array.isArray(lines) || lines.length === 0) throw new ValidationError('The cart is empty.');
+  let subtotal = 0;
+  let items = 0;
+  for (const line of lines) {
+    if (!Number.isInteger(line?.qty) || line.qty < 1 || line.qty > 999) throw new ValidationError(`Quantity for ${line?.id ?? 'an item'} must be a whole number from 1 to 999.`);
+    const product = products.get(line.id);
+    if (!product) throw new ValidationError(`Unknown product: ${line.id}`);
+    subtotal += product.priceCents * line.qty;
+    items += line.qty;
+  }
+  const tier = tierFor(items);
+  const discount = Math.round(subtotal * tier.rate);
+  const tax = Math.round((subtotal - discount) * TAX_RATE);
+  return { items, subtotalCents: subtotal, discountCents: discount, taxCents: tax, totalCents: subtotal - discount + tax, discountRate: tier.rate };
+}
